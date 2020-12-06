@@ -188,7 +188,7 @@ void HuffmanCodes(char item[], int freq[], int size)
 
   int arr[MAX_TREE_HT], top = 0;
 
-  cout << "\nChar | Huffman code \n----------------------\n";
+  cout << "\n Char | Huffman code \n----------------------\n";
   printHCodes(root, arr, top);
 }
 
@@ -243,6 +243,16 @@ void decompress(){ //TODO salvar descompressão
   output.close();
 }
 
+void printFileSize(string filename){
+  streampos begin,end;
+  ifstream file (filename, ios::binary);
+  begin = file.tellg();
+  file.seekg (0, ios::end);
+  end = file.tellg();
+  file.close();
+  cout << "\nSize of " << filename << " : " << (end-begin) << " bytes";
+}
+
 vector<int> getFrequencyVector(vector<char> raw, vector<char> unique){
   vector<int> freq;
   
@@ -258,8 +268,8 @@ vector<int> getFrequencyVector(vector<char> raw, vector<char> unique){
   return freq;
 }
 
-int main()
-{
+
+int main(){
   // Ler o arquivo de entrada input.txt e armazenar os dados em um vector
   vector<char> raw = readCharFile();
   //printf("\n------Raw----");
@@ -281,10 +291,14 @@ int main()
 
   int size = unique.size() / sizeof(unique[0]);
   HuffmanCodes(&unique[0], &freq[0], size);
+  //Imprime tamanho dos arquivos
+  printFileSize("input.txt");
+  printFileSize("output.defreq");
+  printFileSize("output.freq");
 }
 
 /*
-Considere como se os c´odigos de Huffman fossem compostos por
+Considere como se os códigos de Huffman fossem compostos por
 dígitos binários, ou seja, cada símbolo do código ocupa apenas um bit, enquanto cada
 símbolo da entrada é um caractere (que ocupa 8 bits).
 */
