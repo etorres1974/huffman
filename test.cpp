@@ -243,6 +243,21 @@ void decompress(){ //TODO salvar descompressão
   output.close();
 }
 
+vector<int> getFrequencyVector(vector<char> raw, vector<char> unique){
+  vector<int> freq;
+  
+  for(int u = 0 ; u < unique.size(); u++){
+    int counter = 0;
+    for(int r = 0; r < raw.size(); r++){
+      if(unique[u] == raw[r]){
+        counter ++;
+      }
+    }
+    freq.push_back(counter);
+  }
+  return freq;
+}
+
 int main()
 {
   // Ler o arquivo de entrada input.txt e armazenar os dados em um vector
@@ -250,16 +265,13 @@ int main()
   //printf("\n------Raw----");
   //printCharVector(raw);
 
-  // retira as repetições do vector para mapear todos os caractéres usados
+  // Retira as repetições do vector para mapear todos os caractéres usados
   vector<char> unique = vectorToUnique(raw);
   //printf("\n------Unique ----");
   //printCharVector(unique);
 
-  // TODO transformar unique vector em array
-  char arr[] = {'A', 'B', 'C', 'D'}; //Caractéres da entrada
-  // TODO calcular frequenciad de cada elemento.
-    int freq[] = {5, 1, 6, 3};         //frequencia deles
-  //----------------------------------------
+  // Frequencia de cada elemento.
+  vector<int> freq =  getFrequencyVector(raw, unique);
   
   // Escrever a versão compactada
   compress();
@@ -267,12 +279,12 @@ int main()
   // Escrever a versão descompactada
   decompress();
 
-  int size = sizeof(arr) / sizeof(arr[0]);
-  HuffmanCodes(arr, freq, size);
+  int size = unique.size() / sizeof(unique[0]);
+  HuffmanCodes(&unique[0], &freq[0], size);
 }
 
 /*
 Considere como se os c´odigos de Huffman fossem compostos por
-d´ıgitos bin´arios, ou seja, cada s´ımbolo do c´odigo ocupa apenas um bit, enquanto cada
-s´ımbolo da entrada ´e um caractere (que ocupa 8 bits).
+dígitos binários, ou seja, cada símbolo do código ocupa apenas um bit, enquanto cada
+símbolo da entrada é um caractere (que ocupa 8 bits).
 */
