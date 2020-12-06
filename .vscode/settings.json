@@ -41,6 +41,7 @@
         "xutility": "cpp",
         "algorithm": "cpp",
         "array": "cpp",
-        "iterator": "cpp"
+        "iterator": "cpp",
+        "charconv": "cpp"
     }
 }

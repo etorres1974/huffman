@@ -7,9 +7,18 @@
 #include <sys/stat.h>
 #include <algorithm>  
 #include <iterator>
+#include <sstream>
+#include <iostream>
+#include <charconv>
 using namespace std;
 
 #define MAX_TREE_HT 50
+
+struct HuffmanCode
+{
+  char ch;
+  char code[50];
+};
 
 struct MinHNode
 {
@@ -24,7 +33,6 @@ struct MinH
   unsigned capacity;
   struct MinHNode **array;
 };
-
 
 struct MinHNode *newNode(char item, unsigned freq)
 {
@@ -150,6 +158,32 @@ struct MinHNode *buildHfTree(char item[], int freq[], int size)
   return extractMin(minHeap);
 }
 
+
+// Le o arquivo input.txt e retorna seu conteúdo como um vetor de char
+vector<char> readCharFile(string path) {
+    vector<char> v;
+    ifstream in(path);
+    char c;
+    if(in.is_open()) {
+        while(in.good()) {
+            while(in.get(c)){
+              v.push_back(c);
+            }
+        }
+    }
+    if(!in.eof() && in.fail())
+        cout << "error reading " << path << endl;
+
+    in.close();
+    return v;
+}
+
+void printCharVector(vector<char> v){
+  for(int i = 0; i < v.size(); i++){
+    printf("\n Char[%i] : %c", i, v[i]);
+  }
+}
+
 // Imprime array de int
 void printArray(int arr[], int n)
 {
@@ -160,6 +194,30 @@ void printArray(int arr[], int n)
   cout << "\n";
 }
 
+void compress(vector<char> code){ //TODO salvar compressão
+  vector<char> old = readCharFile("output.freq");
+  string output_string(old.begin(), old.end());
+  string s(code.begin(), code.end());
+  ofstream output;
+  output.open("output.freq");
+  output << output_string + s; //Resultado da compactação
+  output.close();
+  //
+}
+
+void decompress(){ //TODO salvar descompressão
+  ofstream output;
+  output.open("output.defreq");
+  output << " descompactado "; //Resultado da descompactação
+  output.close();
+}
+
+void setCodeFromTree(int arr[], int n, char code[50])
+{
+  for (int i = 0; i < n; ++i){
+    code[i] = arr[i];
+  }
+}
 // Imprime recursivamente os nós
 void printHCodes(struct MinHNode *root, int arr[], int top)
 {
@@ -178,8 +236,19 @@ void printHCodes(struct MinHNode *root, int arr[], int top)
   {
     cout << root->item << "  | ";
     printArray(arr, top);
+    vector<char> code;
+    for (int i = 0; i < top; ++i){
+     stringstream ss; 
+     char c;
+     ss << arr[i];
+     ss >> c ;
+     code.push_back(c);
+    }
+    compress(code);
   }
 }
+
+
 
 // TODO mudar o Print do HuffmanCode para salvar os valores ao inves de imprimir
 void HuffmanCodes(char item[], int freq[], int size)
@@ -192,25 +261,6 @@ void HuffmanCodes(char item[], int freq[], int size)
   printHCodes(root, arr, top);
 }
 
-// Le o arquivo input.txt e retorna seu conteúdo como um vetor de char
-vector<char> readCharFile() {
-    vector<char> v;
-    ifstream in("input.txt");
-    char c;
-    if(in.is_open()) {
-        while(in.good()) {
-            while(in.get(c)){
-              v.push_back(c);
-            }
-        }
-    }
-    if(!in.eof() && in.fail())
-        cout << "error reading " << "input.txt" << endl;
-
-    in.close();
-    return v;
-}
-
 // Recebe um vetor de char e retorna um novo vetor apenas com os elementos únicos.
 vector<char> vectorToUnique(vector<char> z){
   vector<char> v;
@@ -221,26 +271,6 @@ vector<char> vectorToUnique(vector<char> z){
   it = unique(v.begin(), v.end());
   v.resize(distance(v.begin(),it)); 
   return v ;
-}
-
-void printCharVector(vector<char> v){
-  for(int i = 0; i < v.size(); i++){
-    printf("\n Char[%i] : %c", i, v[i]);
-  }
-}
-
-void compress(){ //TODO salvar compressão
-  ofstream output;
-  output.open("output.freq");
-  output << " compactado "; //Resultado da compactação
-  output.close();
-}
-
-void decompress(){ //TODO salvar descompressão
-  ofstream output;
-  output.open("output.defreq");
-  output << " descompactado "; //Resultado da descompactação
-  output.close();
 }
 
 void printFileSize(string filename){
@@ -271,7 +301,7 @@ vector<int> getFrequencyVector(vector<char> raw, vector<char> unique){
 
 int main(){
   // Ler o arquivo de entrada input.txt e armazenar os dados em um vector
-  vector<char> raw = readCharFile();
+  vector<char> raw = readCharFile("input.txt");
   //printf("\n------Raw----");
   //printCharVector(raw);
 
@@ -284,7 +314,6 @@ int main(){
   vector<int> freq =  getFrequencyVector(raw, unique);
   
   // Escrever a versão compactada
-  compress();
 
   // Escrever a versão descompactada
   decompress();
@@ -295,6 +324,7 @@ int main(){
   printFileSize("input.txt");
   printFileSize("output.defreq");
   printFileSize("output.freq");
+
 }
 
 /*
