@@ -9,8 +9,7 @@
 #include <iterator>
 #include <sstream>
 #include <iostream>
-#include <charconv>
-#include <bitset>  
+#include <charconv> 
 using namespace std;
 
 #define MAX_TREE_HT 50
@@ -196,23 +195,19 @@ void printArray(int arr[], int n)
 }
 
 
-
 // Transforma a entrada em Huffmancode e salva em output.freq
 void compress(vector<char> raw, vector<HuffmanCode> dictionary){ 
-  cout << "Huffmancode : ";
+  ofstream output;
+  output.open("output.freq");
   for(int r = 0; r < raw.size(); r++){
     for(int d = 0; d < dictionary.size(); d++){
       if(raw[r] == dictionary[d].ch){
         for(int i = 0; i < dictionary[d].code.size(); i++){
-          //Todo Write BITS HERE!
-          cout <<  dictionary[d].code[i];
+           output << dictionary[d].code[i];
         }
       }
     }
   }
-
-  ofstream output;
-  output.open("output.freq");
   output.close();
 }
 //TODO descompressão here
@@ -277,16 +272,6 @@ vector<char> vectorToUnique(vector<char> z){
   return v ;
 }
 
-void printFileSize(string filename){
-  streampos begin,end;
-  ifstream file (filename, ios::binary);
-  begin = file.tellg();
-  file.seekg (0, ios::end);
-  end = file.tellg();
-  file.close();
-  cout << "\nSize of " << filename << " : " << (end-begin) << " bytes";
-}
-
 vector<int> getFrequencyVector(vector<char> raw, vector<char> unique){
   vector<int> freq;
   
@@ -343,14 +328,18 @@ int main(){
 
   compress(raw, hcVec);
   //Imprime tamanho dos arquivos
-  printFileSize("input.txt");
-  printFileSize("output.defreq");
-  printFileSize("output.freq");
-
+  /*
+  Para isso considere como se os códigos de Huffman fossem compostos por
+  dígitos binários, ou seja, cada símbolo do código ocupa apenas um bit, enquanto cada
+  símbolo da entrada é um caractere (que ocupa 8 bits).
+  */
+  int inputSize = raw.size() * 8;
+  vector<char> output = readCharFile("output.freq");
+  vector<char> decompressed = readCharFile("output.defreq");
+  float compressRatio = ( 1 - ((float) output.size() / inputSize) ) * 100;
+  printf("\n Tamanho Entrada = %i bits", inputSize);
+  printf("\n Tamanho Saida comprimida = %i bits", output.size());
+  printf("\n Tamanho Saida descomprimida = %i bits", decompressed.size());
+  printf("\n Taxa de compressão = %f %", compressRatio);
 }
 
-/*
-Considere como se os códigos de Huffman fossem compostos por
-dígitos binários, ou seja, cada símbolo do código ocupa apenas um bit, enquanto cada
-símbolo da entrada é um caractere (que ocupa 8 bits).
-*/
