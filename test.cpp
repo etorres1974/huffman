@@ -14,10 +14,11 @@ using namespace std;
 
 #define MAX_TREE_HT 50
 
-struct HuffmanCode
+class HuffmanCode
 {
-  char ch;
-  char code[50];
+  public :
+    char ch;
+    vector<char> code;
 };
 
 struct MinHNode
@@ -158,7 +159,6 @@ struct MinHNode *buildHfTree(char item[], int freq[], int size)
   return extractMin(minHeap);
 }
 
-
 // Le o arquivo input.txt e retorna seu conteúdo como um vetor de char
 vector<char> readCharFile(string path) {
     vector<char> v;
@@ -194,13 +194,21 @@ void printArray(int arr[], int n)
   cout << "\n";
 }
 
-void compress(vector<char> code){ //TODO salvar compressão
-  vector<char> old = readCharFile("output.freq");
-  string output_string(old.begin(), old.end());
-  string s(code.begin(), code.end());
+// Transforma a entrada em Huffmancode e salva em output.freq
+void compress(vector<char> raw, vector<HuffmanCode> dictionary){ 
+  string compressed = ""; //Todo trocar isso para escrita de bits e não escrita em ASCII
+  for(int r = 0; r < raw.size(); r++){
+    for(int d = 0; d < dictionary.size(); d++){
+      if(raw[r] == dictionary[d].ch){
+        string codedString(dictionary[d].code.begin(), dictionary[d].code.end());
+        compressed += codedString;
+      }
+    }
+  }
+
   ofstream output;
   output.open("output.freq");
-  output << output_string + s; //Resultado da compactação
+  output << compressed; //Resultado da compactação
   output.close();
   //
 }
@@ -219,22 +227,22 @@ void setCodeFromTree(int arr[], int n, char code[50])
   }
 }
 // Imprime recursivamente os nós
-void printHCodes(struct MinHNode *root, int arr[], int top)
+void printHCodes(struct MinHNode *root, int arr[], int top, vector<HuffmanCode> &hc)
 {
   if (root->left)
   {
     arr[top] = 0;
-    printHCodes(root->left, arr, top + 1);
+    printHCodes(root->left, arr, top + 1, hc);
   }
 
   if (root->right)
   {
     arr[top] = 1;
-    printHCodes(root->right, arr, top + 1);
+    printHCodes(root->right, arr, top + 1, hc);
   }
   if (isLeaf(root))
   {
-    cout << root->item << "  | ";
+    cout << root->item << " : ";
     printArray(arr, top);
     vector<char> code;
     for (int i = 0; i < top; ++i){
@@ -244,21 +252,14 @@ void printHCodes(struct MinHNode *root, int arr[], int top)
      ss >> c ;
      code.push_back(c);
     }
-    compress(code);
+    // Salva o par no vetor recebido pra poder usar de voltan na main;
+    for(int h = 0; h < hc.size(); h++){
+        if( root->item ==  hc[h].ch){
+          hc[h].code = code;
+        }
+    }
+    
   }
-}
-
-
-
-// TODO mudar o Print do HuffmanCode para salvar os valores ao inves de imprimir
-void HuffmanCodes(char item[], int freq[], int size)
-{
-  struct MinHNode *root = buildHfTree(item, freq, size);
-
-  int arr[MAX_TREE_HT], top = 0;
-
-  cout << "\n Char | Huffman code \n----------------------\n";
-  printHCodes(root, arr, top);
 }
 
 // Recebe um vetor de char e retorna um novo vetor apenas com os elementos únicos.
@@ -312,14 +313,32 @@ int main(){
 
   // Frequencia de cada elemento.
   vector<int> freq =  getFrequencyVector(raw, unique);
-  
-  // Escrever a versão compactada
+  //printf("\n------frequency ----");
+  //for( int i = 0; i < freq.size(); i++){
+  //  cout << "\nf " << i << " : " << freq[i];
+  //}
+
 
   // Escrever a versão descompactada
   decompress();
 
   int size = unique.size() / sizeof(unique[0]);
-  HuffmanCodes(&unique[0], &freq[0], size);
+
+  struct MinHNode *root = buildHfTree(&unique[0], &freq[0], size);
+  // Um dicionário com a relação entre letra e código
+  vector<HuffmanCode> hcVec;
+
+  for(int h = 0; h < unique.size(); h++){
+    HuffmanCode hc;
+    hc.ch = unique[h];
+    hcVec.push_back(hc);
+  }
+  int arr[MAX_TREE_HT], top = 0;
+
+  cout << "\n Char - code \n";
+  printHCodes(root, arr, top, hcVec);
+
+  compress(raw, hcVec);
   //Imprime tamanho dos arquivos
   printFileSize("input.txt");
   printFileSize("output.defreq");
