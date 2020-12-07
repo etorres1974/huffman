@@ -42,6 +42,7 @@
         "algorithm": "cpp",
         "array": "cpp",
         "iterator": "cpp",
-        "charconv": "cpp"
+        "charconv": "cpp",
+        "bitset": "cpp"
     }
 }

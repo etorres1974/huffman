@@ -10,6 +10,7 @@
 #include <sstream>
 #include <iostream>
 #include <charconv>
+#include <bitset>  
 using namespace std;
 
 #define MAX_TREE_HT 50
@@ -194,26 +195,28 @@ void printArray(int arr[], int n)
   cout << "\n";
 }
 
+
+
 // Transforma a entrada em Huffmancode e salva em output.freq
 void compress(vector<char> raw, vector<HuffmanCode> dictionary){ 
-  string compressed = ""; //Todo trocar isso para escrita de bits e não escrita em ASCII
+  cout << "Huffmancode : ";
   for(int r = 0; r < raw.size(); r++){
     for(int d = 0; d < dictionary.size(); d++){
       if(raw[r] == dictionary[d].ch){
-        string codedString(dictionary[d].code.begin(), dictionary[d].code.end());
-        compressed += codedString;
+        for(int i = 0; i < dictionary[d].code.size(); i++){
+          //Todo Write BITS HERE!
+          cout <<  dictionary[d].code[i];
+        }
       }
     }
   }
 
   ofstream output;
   output.open("output.freq");
-  output << compressed; //Resultado da compactação
   output.close();
-  //
 }
-
-void decompress(){ //TODO salvar descompressão
+//TODO descompressão here
+void decompress(){ 
   ofstream output;
   output.open("output.defreq");
   output << " descompactado "; //Resultado da descompactação
@@ -335,7 +338,7 @@ int main(){
   }
   int arr[MAX_TREE_HT], top = 0;
 
-  cout << "\n Char - code \n";
+  cout << "Char : Code \n";
   printHCodes(root, arr, top, hcVec);
 
   compress(raw, hcVec);
